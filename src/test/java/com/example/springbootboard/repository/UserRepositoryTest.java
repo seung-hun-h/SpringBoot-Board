@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.Commit;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -36,6 +37,8 @@ class UserRepositoryTest {
                 .age(27)
                 .hobby(Hobby.SPORTS)
                 .createdBy("createdBy")
+                .email("email@naver.com")
+                .password("1passworD")
                 .createdAt(LocalDateTime.now())
                 .build();
         //when
@@ -58,12 +61,14 @@ class UserRepositoryTest {
                 .age(27)
                 .hobby(Hobby.SPORTS)
                 .createdBy("createdBy")
+                .email("email@naver.com")
+                .password("1passworD")
                 .createdAt(LocalDateTime.now())
                 .build();
         User entity = userRepository.save(user);
 
         //when
-        entity.update("update", user.getAge(), user.getHobby());
+        entity.update("update", user.getAge(), user.getHobby(), user.getPassword());
 
         //then
         Optional<User> find = userRepository.findById(user.getId());
@@ -82,6 +87,8 @@ class UserRepositoryTest {
                 .hobby(Hobby.SPORTS)
                 .createdBy("createdBy")
                 .createdAt(LocalDateTime.now())
+                .email("email@naver.com")
+                .password("1passworD")
                 .build();
         userRepository.save(user);
 
@@ -93,4 +100,29 @@ class UserRepositoryTest {
         assertThat(userRepository.count()).isEqualTo(0);
         assertThat(find).isEmpty();
     }
+
+    @Test
+    @DisplayName("이메일로 사용자를 검색할 수 있다")
+    public void testFindByEmail() throws Exception {
+        //given
+        User user = User.builder()
+                .name("seunghun")
+                .age(27)
+                .hobby(Hobby.SPORTS)
+                .createdBy("createdBy")
+                .createdAt(LocalDateTime.now())
+                .email("email@naver.com")
+                .password("1passworD")
+                .build();
+
+        userRepository.save(user);
+        //when
+        Optional<User> found = userRepository.findByEmail(user.getEmail());
+
+        //then
+        assertThat(found).isPresent();
+        assertThat(found.get().getEmail()).isEqualTo(user.getEmail());
+    }
+
+
 }
