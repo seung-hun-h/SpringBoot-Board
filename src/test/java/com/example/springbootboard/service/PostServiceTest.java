@@ -1,7 +1,9 @@
 package com.example.springbootboard.service;
 
+import com.example.springbootboard.domain.Hobby;
 import com.example.springbootboard.domain.Post;
 import com.example.springbootboard.domain.Title;
+import com.example.springbootboard.domain.User;
 import com.example.springbootboard.dto.*;
 import com.example.springbootboard.dto.request.RequestCreatePost;
 import com.example.springbootboard.dto.request.RequestUpdatePost;
@@ -9,21 +11,18 @@ import com.example.springbootboard.dto.response.PostDto;
 import com.example.springbootboard.repository.PostRepository;
 import com.example.springbootboard.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Slf4j
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Transactional
 @SpringBootTest
 public class PostServiceTest {
@@ -37,15 +36,22 @@ public class PostServiceTest {
     @Autowired
     UserRepository userRepository;
 
-    UserDto requestUser = null;
+    User user = null;
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
-        requestUser = UserDto.builder()
-                .age(27)
+        user = userRepository.save(User.builder()
+                .email("hello123@naver.com")
+                .password("passwordABC!123@")
                 .name("seunghun")
-                .hobby("SPORTS")
-                .build();
+                .createdAt(LocalDateTime.now())
+                .createdBy("seunghun")
+                .build());
+    }
+
+    @AfterEach
+    void clean() {
+        userRepository.deleteAll();
     }
 
     @Test
@@ -58,10 +64,12 @@ public class PostServiceTest {
     @DisplayName("게시글이 저장된다")
     public void testPostSave() throws Exception {
         //given
+        user.login(user.getPassword());
+
         RequestCreatePost request = RequestCreatePost.builder()
                 .content("content")
                 .title("title")
-                .userDto(requestUser)
+                .userId(user.getId())
                 .build();
 
         //when
@@ -79,10 +87,11 @@ public class PostServiceTest {
     @DisplayName("게시글을 단건 조회한다")
     public void testFindOne() throws Exception {
         //given
+        user.login(user.getPassword());
         RequestCreatePost request = RequestCreatePost.builder()
                 .content("content")
                 .title("title")
-                .userDto(requestUser)
+                .userId(user.getId())
                 .build();
 
         Long postId = postService.save(request);
@@ -100,22 +109,23 @@ public class PostServiceTest {
     @DisplayName("게시글을 모두 조회한다")
     public void testFindAll() throws Exception {
         //given
+        user.login(user.getPassword());
         RequestCreatePost request1 = RequestCreatePost.builder()
                 .content("content1")
                 .title("title1")
-                .userDto(requestUser)
+                .userId(user.getId())
                 .build();
 
         RequestCreatePost request2 = RequestCreatePost.builder()
                 .content("content2")
                 .title("title2")
-                .userDto(requestUser)
+                .userId(user.getId())
                 .build();
 
         RequestCreatePost request3 = RequestCreatePost.builder()
                 .content("content3")
                 .title("title3")
-                .userDto(requestUser)
+                .userId(user.getId())
                 .build();
 
         PageRequest pageRequest = PageRequest.of(0, 10);
@@ -135,10 +145,12 @@ public class PostServiceTest {
     @DisplayName("게시글을 수정한다")
     public void testUpdatePost() throws Exception {
         //given
+        user.login(user.getPassword());
+
         RequestCreatePost requestCreate = RequestCreatePost.builder()
                 .content("content")
                 .title("title")
-                .userDto(requestUser)
+                .userId(user.getId())
                 .build();
 
         Long postId = postService.save(requestCreate);
@@ -146,6 +158,7 @@ public class PostServiceTest {
         RequestUpdatePost requestUpdate = RequestUpdatePost.builder()
                 .title("update title")
                 .content("update content")
+                .userId(user.getId())
                 .build();
 
         //when

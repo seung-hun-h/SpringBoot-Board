@@ -1,5 +1,6 @@
 package com.example.springbootboard.domain;
 
+import com.example.springbootboard.error.exception.AuthenticationCredentialNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -20,6 +21,7 @@ class UserTest {
                 .createdAt(LocalDateTime.now())
                 .email("email@naver.com")
                 .password("1passworD")
+                .name("admin")
                 .build();
     }
     
@@ -176,13 +178,14 @@ class UserTest {
         String createdBy = "createdBy";
         LocalDateTime createdAt = LocalDateTime.now();
         String email = "aaa2@naver.com";
-
+        String name = "seunghun";
         //when
         User user = User.builder()
                 .password(password)
                 .createdAt(createdAt)
                 .createdBy(createdBy)
                 .email(email)
+                .name(name)
                 .build();
 
         // then
@@ -241,6 +244,7 @@ class UserTest {
         LocalDateTime createdAt = LocalDateTime.now();
         String email = "aaa2@naver.com";
         String password = "1Ab$abdc";
+        String name = "seunghun";
 
         //when
         User user = User.builder()
@@ -248,6 +252,7 @@ class UserTest {
                 .createdAt(createdAt)
                 .createdBy(createdBy)
                 .email(email)
+                .name(name)
                 .build();
 
         // then
@@ -263,6 +268,7 @@ class UserTest {
         LocalDateTime createdAt = LocalDateTime.now();
         String email = "aaa2@naver.com";
         String password = "1Ab$a".repeat(6);
+        String name = "seunghun";
 
         //when
         User user = User.builder()
@@ -270,6 +276,7 @@ class UserTest {
                 .createdAt(createdAt)
                 .createdBy(createdBy)
                 .email(email)
+                .name(name)
                 .build();
 
         // then
@@ -285,12 +292,14 @@ class UserTest {
         LocalDateTime createdAt = LocalDateTime.now();
         String email = "aaa2@naver.com";
         String password = "1Ab$abdc";
+        String name = "seunghun";
 
         User user = User.builder()
                 .password(password)
                 .createdAt(createdAt)
                 .createdBy(createdBy)
                 .email(email)
+                .name(name)
                 .build();
 
         //when
@@ -308,12 +317,14 @@ class UserTest {
         LocalDateTime createdAt = LocalDateTime.now();
         String email = "aaa2@naver.com";
         String password = "1Ab$abdc";
+        String name = "name";
 
         User user = User.builder()
                 .password(password)
                 .createdAt(createdAt)
                 .createdBy(createdBy)
                 .email(email)
+                .name(name)
                 .build();
         user.login(password);
 
@@ -332,16 +343,18 @@ class UserTest {
         LocalDateTime createdAt = LocalDateTime.now();
         String email = "aaa2@naver.com";
         String password = "1Ab$abdc";
+        String name = "seunghun";
 
         User user = User.builder()
                 .password(password)
                 .createdAt(createdAt)
                 .createdBy(createdBy)
                 .email(email)
+                .name(name)
                 .build();
 
         // then
-        assertThrows(IllegalArgumentException.class, () -> {
+        assertThrows(AuthenticationCredentialNotFoundException.class, () -> {
             //when
             user.login("AnotherPassword1");
         });
@@ -355,12 +368,14 @@ class UserTest {
         LocalDateTime createdAt = LocalDateTime.now();
         String email = "aaa2@naver.com";
         String password = "1Ab$abdc";
+        String name = "name";
 
         User user = User.builder()
                 .password(password)
                 .createdAt(createdAt)
                 .createdBy(createdBy)
                 .email(email)
+                .name(name)
                 .build();
 
         user.login(password);
@@ -382,12 +397,14 @@ class UserTest {
         LocalDateTime createdAt = LocalDateTime.now();
         String email = "aaa2@naver.com";
         String password = "1Ab$abdc";
+        String name = "name";
 
         User user = User.builder()
                 .password(password)
                 .createdAt(createdAt)
                 .createdBy(createdBy)
                 .email(email)
+                .name(name)
                 .build();
 
         // then

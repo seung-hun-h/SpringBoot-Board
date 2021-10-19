@@ -1,8 +1,11 @@
 package com.example.springbootboard.controller;
 
+import com.example.springbootboard.domain.Hobby;
+import com.example.springbootboard.domain.User;
 import com.example.springbootboard.dto.request.RequestCreatePost;
 import com.example.springbootboard.dto.request.RequestUpdatePost;
 import com.example.springbootboard.dto.UserDto;
+import com.example.springbootboard.repository.UserRepository;
 import com.example.springbootboard.service.PostService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +23,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,31 +53,38 @@ class PostApiControllerTest {
     @Autowired
     private PostService postService;
 
+    @Autowired
+    private UserRepository userRepository;
+
+
     private ValidatorFactory factory;
 
     private Validator validator;
 
-    UserDto requestUser = null;
+    User user = null;
 
     @BeforeAll
     void setUp() {
-        requestUser = UserDto.builder()
-                .age(27)
+        user = User.builder()
+                .email("hello123@naver.com")
+                .password("password!ASV123@")
+                .createdAt(LocalDateTime.now())
+                .createdBy("seunghun")
                 .name("seunghun")
-                .hobby("SPORTS")
                 .build();
 
-        factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
+        user.login(user.getPassword());
+
+        userRepository.save(user);
     }
 
     @AfterEach
     void restore() {
-        requestUser = UserDto.builder()
-                .age(27)
-                .name("seunghun")
-                .hobby("SPORTS")
-                .build();
+//        requestUser = UserDto.builder()
+//                .age(27)
+//                .name("seunghun")
+//                .hobby(Hobby.SPORTS)
+//                .build();
     }
 
     @Test
@@ -81,7 +92,7 @@ class PostApiControllerTest {
     public void testSavePost() throws Exception {
         //given
         RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(requestUser)
+                .userId(user.getId())
                 .title("나는 전설이다")
                 .content("좀비 세상에서 살아남기")
                 .build();
@@ -102,10 +113,7 @@ class PostApiControllerTest {
                         requestFields(
                             fieldWithPath("title").type(STRING).description("title"),
                             fieldWithPath("content").type(STRING).description("content"),
-                            fieldWithPath("user").type(OBJECT).description("user"),
-                            fieldWithPath("user.name").type(STRING).description("user.name"),
-                            fieldWithPath("user.age").type(NUMBER).description("user.age"),
-                            fieldWithPath("user.hobby").type(STRING).description("user.hobby")
+                            fieldWithPath("userId").type(NUMBER).description("userId")
                         )
                 ));
     }
@@ -116,7 +124,7 @@ class PostApiControllerTest {
     public void testGetOne() throws Exception {
         //given
         RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(requestUser)
+                .userId(user.getId())
                 .title("나는 전설이다")
                 .content("좀비 세상에서 살아남기")
                 .build();
@@ -158,7 +166,7 @@ class PostApiControllerTest {
     public void testGetAll() throws Exception {
         //given
         RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(requestUser)
+                .userId(user.getId())
                 .title("나는 전설이다")
                 .content("좀비 세상에서 살아남기")
                 .build();
@@ -204,7 +212,7 @@ class PostApiControllerTest {
     public void testUpdatePost() throws Exception {
         //given
         RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(requestUser)
+                .userId(user.getId())
                 .title("나는 전설이다")
                 .content("좀비 세상에서 살아남기")
                 .build();
@@ -214,6 +222,7 @@ class PostApiControllerTest {
         RequestUpdatePost update = RequestUpdatePost.builder()
                 .content("update content")
                 .title("update title")
+                .userId(user.getId())
                 .build();
 
         String json = objectMapper.writeValueAsString(update);
@@ -231,6 +240,7 @@ class PostApiControllerTest {
                                 parameterWithName("postId").description("postId")
                         ),
                         requestFields(
+                                fieldWithPath("userId").type(NUMBER).description("userId"),
                                 fieldWithPath("title").type(STRING).description("title"),
                                 fieldWithPath("content").type(STRING).description("content")
                         ))
@@ -242,7 +252,7 @@ class PostApiControllerTest {
     public void testDeletePost() throws Exception {
         //given
         RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(requestUser)
+                .userId(user.getId())
                 .title("나는 전설이다")
                 .content("좀비 세상에서 살아남기")
                 .build();
@@ -267,7 +277,7 @@ class PostApiControllerTest {
     public void testIllegalArgumentException() throws Exception {
         //given
         RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(requestUser)
+                .userId(user.getId())
                 .title("나는 전설이다")
                 .content("좀비 세상에서 살아남기")
                 .build();
@@ -277,6 +287,7 @@ class PostApiControllerTest {
         RequestUpdatePost update = RequestUpdatePost.builder()
                 .content("update content")
                 .title("update title")
+                .userId(user.getId())
                 .build();
 
         String json = objectMapper.writeValueAsString(update);
@@ -290,161 +301,4 @@ class PostApiControllerTest {
         actions.andExpect(status().isInternalServerError())
                 .andDo(print());
     }
-
-
-    @Test
-    @DisplayName("사용자 이름은 Null이 될 수 없다")
-    public void testUserNameNull() throws Exception {
-        //given
-        requestUser.setName(null);
-
-        //when
-        Set<ConstraintViolation<UserDto>> validate = validator.validate(requestUser);
-
-        //then
-        assertThat(validate).isNotEmpty();
-        log.info("validation message: {}", validate);
-    }
-
-    @Test
-    @DisplayName("사용자 이름은 빈 문자열이 될 수 없다")
-    public void testUserNameEmptyString() throws Exception {
-        //given
-        requestUser.setName("");
-
-        //when
-        Set<ConstraintViolation<UserDto>> validate = validator.validate(requestUser);
-
-        //then
-        assertThat(validate).isNotEmpty();
-        log.info("validation message: {}", validate);
-    }
-
-    @Test
-    @DisplayName("사용자 나이는 null이 될 수 없다")
-    public void testUserAgeNull() throws Exception {
-        //given
-        requestUser.setAge(null);
-
-        //when
-        Set<ConstraintViolation<UserDto>> validate = validator.validate(requestUser);
-
-        //then
-        assertThat(validate).isNotEmpty();
-
-        log.info("validation message: {}", validate);
-    }
-
-    @Test
-    @DisplayName("사용자 취미는 null이 될 수 없다")
-    public void testUserHobbyNull() throws Exception {
-        //given
-        requestUser.setHobby(null);
-
-        //when
-        Set<ConstraintViolation<UserDto>> validate = validator.validate(requestUser);
-
-        //then
-        assertThat(validate).isNotEmpty();
-        log.info("validation message: {}", validate);
-    }
-
-    @Test
-    @DisplayName("사용자 Dto null이 될 수 없다")
-    public void testUserDtoNull() throws Exception {
-        //given
-        RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(null)
-                .title("나는 전설이다")
-                .content("좀비 세상에서 살아남기")
-                .build();
-
-
-        //when
-        Set<ConstraintViolation<RequestCreatePost>> validate = validator.validate(request);
-
-        //then
-        assertThat(validate).isNotEmpty();
-        log.info("validation message: {}", validate);
-    }
-
-    @Test
-    @DisplayName("게시물 제목은 null이 될 수 없다")
-    public void testPostTitleNull() throws Exception {
-        //given
-        RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(requestUser)
-                .title(null)
-                .content("좀비 세상에서 살아남기")
-                .build();
-
-
-        //when
-        Set<ConstraintViolation<RequestCreatePost>> validate = validator.validate(request);
-
-        //then
-        assertThat(validate).isNotEmpty();
-        log.info("validation message: {}", validate);
-    }
-
-    @Test
-    @DisplayName("게시물 제목은 빈 문자열이 될 수 없다")
-    public void testPostTitleEmptyString() throws Exception {
-        //given
-        RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(requestUser)
-                .title("")
-                .content("좀비 세상에서 살아남기")
-                .build();
-
-
-        //when
-        Set<ConstraintViolation<RequestCreatePost>> validate = validator.validate(request);
-
-        //then
-        assertThat(validate).isNotEmpty();
-        log.info("validation message: {}", validate);
-    }
-
-    @Test
-    @DisplayName("게시물 제목은 40자를 넘을 수 없다")
-    public void testPostTitleOverLimit() throws Exception {
-        //given
-        RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(requestUser)
-                .title("A".repeat(41))
-                .content("좀비 세상에서 살아남기")
-                .build();
-
-
-        //when
-        Set<ConstraintViolation<RequestCreatePost>> validate = validator.validate(request);
-
-        //then
-        assertThat(validate).isNotEmpty();
-        log.info("validation message: {}", validate);
-    }
-
-    @Test
-    @DisplayName("게시물 내용은 null이 될 수 없다")
-    public void testPostContentNull() throws Exception {
-        //given
-        RequestCreatePost request = RequestCreatePost.builder()
-                .userDto(requestUser)
-                .title("나는 전설이다")
-                .content(null)
-                .build();
-
-
-        //when
-        Set<ConstraintViolation<RequestCreatePost>> validate = validator.validate(request);
-
-        //then
-        assertThat(validate).isNotEmpty();
-        log.info("validation message: {}", validate);
-    }
-
-
-
-
 }

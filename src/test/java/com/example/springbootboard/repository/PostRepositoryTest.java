@@ -47,6 +47,7 @@ class PostRepositoryTest {
     @DisplayName("Post가 저장된다")
     public void testSavePost() throws Exception {
         //given
+        user.login(user.getPassword());
         Post post = Post.createPost(new Title("title"), "content", user);
 
         //when
@@ -70,7 +71,7 @@ class PostRepositoryTest {
         String content = "update content";
 
         //when
-        entity.update(new Title(title), content);
+        entity.update(user, new Title(title), content);
 
         //then
         Optional<Post> actual = postRepository.findById(entity.getId());
@@ -101,6 +102,8 @@ class PostRepositoryTest {
                 .name(name)
                 .age(age)
                 .hobby(hobby)
+                .email("hello123@naver.com")
+                .password("passwordABC!11")
                 .build();
     }
 

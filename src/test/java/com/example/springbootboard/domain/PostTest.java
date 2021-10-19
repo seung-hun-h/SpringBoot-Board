@@ -17,7 +17,7 @@ class PostTest {
     @DisplayName("Post title은 null이 될 수 없다")
     public void testPostTitleNull() throws Exception {
         //given
-        User user = createUser("user", 27, Hobby.SPORTS);
+        User user = createUser("email12@naver.com", "password123!@#ABC", "seunghun");
 
         //then
         assertThrows(IllegalArgumentException.class, () -> {
@@ -30,7 +30,7 @@ class PostTest {
     @DisplayName("Post content는 null이 될 수 없다")
     public void testPostContentNull() throws Exception {
         //given
-        User user = createUser("user", 27, Hobby.SPORTS);
+        User user = createUser("email12@naver.com", "password123!@#ABC", "seunghun");
 
         //then
         assertThrows(IllegalArgumentException.class, () -> {
@@ -43,7 +43,7 @@ class PostTest {
     @DisplayName("Post title의 길이는 제한을 넘을 수 없다")
     public void testPostTitleOverLimit() throws Exception {
         //given
-        User user = createUser("user", 27, Hobby.SPORTS);
+        User user = createUser("email12@naver.com", "password123!@#ABC", "seunghun");
 
         //then
         assertThrows(IllegalArgumentException.class, () -> {
@@ -56,7 +56,7 @@ class PostTest {
     @DisplayName("Post title의 길이는 0이 될 수 없다")
     public void testPostUserNull() throws Exception {
         //given
-        User user = createUser("user", 27, Hobby.SPORTS);
+        User user = createUser("email12@naver.com", "password123!@#ABC", "seunghun");
 
         //then
         assertThrows(IllegalArgumentException.class, () -> {
@@ -69,9 +69,7 @@ class PostTest {
     @DisplayName("Post를 생성할 수 있다.")
     public void testCreatePost() throws Exception {
         //given
-        User user = createUser("user", 27, Hobby.SPORTS);
-
-
+        User user = createUser("email12@naver.com", "password123!@#ABC", "seunghun");
         //when
         Post post = Post.createPost(new Title("title"), "content", user);
 
@@ -83,12 +81,12 @@ class PostTest {
     @DisplayName("Post의 content를 수정할 수 있다")
     public void testUpdatePost() throws Exception {
         //given
-        User user = createUser("user", 27, Hobby.SPORTS);
+        User user = createUser("email12@naver.com", "password123!@#ABC", "seunghun");
         Post post = Post.createPost(new Title("title"), "content", user);
         String updateContent = "update content";
 
         //when
-        post.update(post.getTitle(), "update content");
+        post.update(user, post.getTitle(), "update content");
 
         //then
         assertThat(post.getContent()).isEqualTo(updateContent);
@@ -98,25 +96,28 @@ class PostTest {
     @DisplayName("Post의 title을 수정할 수 있다")
     public void testUpdateTitle() throws Exception {
         //given
-        User user = createUser("user", 27, Hobby.SPORTS);
+        User user = createUser("email12@naver.com", "password123!@#ABC", "seunghun");
         Post post = Post.createPost(new Title("title"), "content", user);
         String updateTitle = "update title";
 
         //when
-        post.update(new Title(updateTitle), post.getContent());
+        post.update(user, new Title(updateTitle), post.getContent());
 
         //then
         assertThat(post.getTitle()).isEqualTo(new Title(updateTitle));
     }
 
-    private User createUser(String name, int age, Hobby hobby) {
-        return User.builder()
+    private User createUser(String email, String password, String name) {
+        User user = User.builder()
                 .createdAt(LocalDateTime.now())
-                .createdBy(name)
+                .createdBy(email)
+                .password(password)
+                .email(email)
                 .name(name)
-                .age(age)
-                .hobby(hobby)
                 .build();
+
+        user.login(user.getPassword());
+        return user;
     }
 
 

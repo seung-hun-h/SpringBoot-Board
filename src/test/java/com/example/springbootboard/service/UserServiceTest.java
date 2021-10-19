@@ -13,9 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -35,6 +32,12 @@ class UserServiceTest {
     @Autowired
     private UserRepository userRepository;
 
+    @BeforeEach
+    void clean() {
+        userRepository.deleteAll();
+    }
+
+
     @Test
     public void testNotNull() throws Exception {
         //given 
@@ -52,6 +55,7 @@ class UserServiceTest {
         RequestSaveUser request = RequestSaveUser.builder()
                 .email("hello12@naver.com")
                 .password("Hello123@@@@")
+                .name("seunghun")
                 .build();
 
         // when
@@ -70,6 +74,7 @@ class UserServiceTest {
         RequestSaveUser request = RequestSaveUser.builder()
                 .email("hello12@naver.com")
                 .password("Hello123@@@@")
+                .name("seunghun")
                 .build();
 
         userService.save(request);
@@ -77,6 +82,7 @@ class UserServiceTest {
         RequestSaveUser request2 = RequestSaveUser.builder()
                 .email("hello12@naver.com")
                 .password("Hello123@@@@")
+                .name("seunghun")
                 .build();
 
         // then
@@ -93,6 +99,7 @@ class UserServiceTest {
         RequestSaveUser request = RequestSaveUser.builder()
                 .email("hello12@naver.com")
                 .password("Hello123@@@@")
+                .name("seunghun")
                 .build();
         // when
         Long userId = userService.save(request);
@@ -109,6 +116,7 @@ class UserServiceTest {
         RequestSaveUser request = RequestSaveUser.builder()
                 .email("hello12@naver.com")
                 .password("Hello123@@@@")
+                .name("seunghun")
                 .build();
         Long userId = userService.save(request);
 
@@ -126,6 +134,7 @@ class UserServiceTest {
         RequestSaveUser request = RequestSaveUser.builder()
                 .email("hello12@naver.com")
                 .password("Hello123@@@@")
+                .name("seunghun")
                 .build();
         Long userId = userService.save(request);
 
@@ -143,6 +152,7 @@ class UserServiceTest {
         RequestSaveUser request = RequestSaveUser.builder()
                 .email("hello12@naver.com")
                 .password("Hello123@@@@")
+                .name("seunghun")
                 .build();
         Long userId = userService.save(request);
 
@@ -162,6 +172,7 @@ class UserServiceTest {
                 .createdAt(LocalDateTime.now())
                 .password("passwordAbc123@")
                 .email("email123@naver.com")
+                .name("seunghun")
                 .build();
 
         userRepository.save(user);
@@ -170,7 +181,8 @@ class UserServiceTest {
         userService.login(user.getEmail(), user.getPassword());
 
         //then
-        assertThat(user.isLogin()).isTrue();
+        User actual = userRepository.findById(user.getId()).get();
+        assertThat(actual.isLogin()).isTrue();
     }
 
     @Test
@@ -182,6 +194,7 @@ class UserServiceTest {
                 .createdAt(LocalDateTime.now())
                 .password("passwordAbc123@")
                 .email("email123@naver.com")
+                .name("seunghun")
                 .build();
 
         userRepository.save(user);
@@ -201,6 +214,7 @@ class UserServiceTest {
         RequestSaveUser request = RequestSaveUser.builder()
                 .email("hello12@naver.com")
                 .password("Hello123@@@@")
+                .name("seunghun")
                 .build();
         Long id = userService.save(request);
 
@@ -231,6 +245,7 @@ class UserServiceTest {
         RequestSaveUser request = RequestSaveUser.builder()
                 .email("hello12@naver.com")
                 .password("Hello123@@@@")
+                .name("seunghun")
                 .build();
         Long id = userService.save(request);
 
@@ -259,6 +274,7 @@ class UserServiceTest {
                 .createdAt(LocalDateTime.now())
                 .password("passwordAbc123@")
                 .email("email123@naver.com")
+                .name("seunghun")
                 .build();
 
         userRepository.save(user);
@@ -281,6 +297,7 @@ class UserServiceTest {
                 .createdAt(LocalDateTime.now())
                 .password("passwordAbc123@")
                 .email("email123@naver.com")
+                .name("seunghun")
                 .build();
 
         userRepository.save(user);

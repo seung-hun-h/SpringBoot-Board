@@ -66,12 +66,12 @@ class UserRepositoryTest {
                 .createdAt(LocalDateTime.now())
                 .build();
         User entity = userRepository.save(user);
-
+        entity.login(entity.getPassword());
         //when
         entity.update("update", user.getAge(), user.getHobby(), user.getPassword());
 
         //then
-        Optional<User> find = userRepository.findById(user.getId());
+        Optional<User> find = userRepository.findById(entity.getId());
         assertThat(userRepository.count()).isEqualTo(1);
         assertThat(find).isPresent();
         assertThat(find.get().getName()).isEqualTo(entity.getName());
