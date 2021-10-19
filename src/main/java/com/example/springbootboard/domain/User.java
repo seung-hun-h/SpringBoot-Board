@@ -1,6 +1,6 @@
 package com.example.springbootboard.domain;
 
-import com.example.springbootboard.error.exception.UserAlreadyLoggedInException;
+import com.example.springbootboard.error.exception.NotAllowedAccessException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -9,10 +9,8 @@ import org.springframework.util.Assert;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
-import javax.validation.constraints.Min;
 import java.text.MessageFormat;
 import java.time.LocalDateTime;
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 @Getter
@@ -22,6 +20,7 @@ import java.util.regex.Pattern;
 )
 @Entity
 public class User extends BaseEntity {
+
     private static final String nameRegex = "^[가-힣a-zA-Z0-9_]{1,30}$";
     /***
      * - at least 8 characters
@@ -39,7 +38,7 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 30)
+    @Column(name = "name", length = 30)
     private String name;
 
     @Column(name = "age")
@@ -76,8 +75,8 @@ public class User extends BaseEntity {
     public void update(String name, Integer age, Hobby hobby, String password) {
         validate(name, age, this.email, password);
 
-        if (!isLoggedIn())
-            throw new RuntimeException(MessageFormat.format("Could not update not logged in user. email = {0}", this.email));
+        if (!isLogin())
+            throw new NotAllowedAccessException(MessageFormat.format("User is not logged in. email = {0}", this.email));
 
         this.name = name;
         this.age = age;
@@ -92,15 +91,18 @@ public class User extends BaseEntity {
             throw new IllegalArgumentException(MessageFormat.format("Wrong password. password = {0}", password));
         }
 
-        if (this.isLoggedIn()) {
-            throw new UserAlreadyLoggedInException("User is already logged in");
+        if (this.isLogin()) {
+            throw new IllegalStateException("User is already logged in");
         }
 
         this.login = true;
     }
 
-    public boolean isLoggedIn() {
-        return login;
+    public void logout() {
+        if (!isLogin())
+            throw new NotAllowedAccessException(MessageFormat.format("User is not logged in. email = {0}", this.email));
+
+        this.login = false;
     }
 
     //== 검증 메서드 ==//
@@ -149,4 +151,6 @@ public class User extends BaseEntity {
             throw new IllegalArgumentException(MessageFormat.format("User age should be over 0. age = {0}", age));
         }
     }
+
+
 }

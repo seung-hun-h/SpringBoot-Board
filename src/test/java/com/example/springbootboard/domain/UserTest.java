@@ -1,7 +1,5 @@
 package com.example.springbootboard.domain;
 
-import com.example.springbootboard.error.exception.UserAlreadyLoggedInException;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -299,7 +297,7 @@ class UserTest {
         user.login(password);
 
         // then
-        assertThat(user.isLoggedIn()).isTrue();
+        assertThat(user.isLogin()).isTrue();
     }
 
     @Test
@@ -320,7 +318,7 @@ class UserTest {
         user.login(password);
 
         // then
-        assertThrows(UserAlreadyLoggedInException.class, () -> {
+        assertThrows(IllegalStateException.class, () -> {
             //when
             user.login(password);
         });

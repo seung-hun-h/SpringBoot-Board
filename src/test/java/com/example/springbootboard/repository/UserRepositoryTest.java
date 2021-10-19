@@ -124,5 +124,27 @@ class UserRepositoryTest {
         assertThat(found.get().getEmail()).isEqualTo(user.getEmail());
     }
 
+    @Test
+    @DisplayName("이메일로 사용자가 존재하는지 알 수 있다.")
+    public void testExistByEmail() throws Exception {
+        //given
+        User user = User.builder()
+                .name("seunghun")
+                .age(27)
+                .hobby(Hobby.SPORTS)
+                .createdBy("createdBy")
+                .createdAt(LocalDateTime.now())
+                .email("email@naver.com")
+                .password("1passworD")
+                .build();
+
+        userRepository.save(user);
+        //when
+        boolean exists = userRepository.existsByEmail(user.getEmail());
+
+        //then
+        assertThat(exists).isTrue();
+    }
+
 
 }
