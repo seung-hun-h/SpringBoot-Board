@@ -1,5 +1,6 @@
 package com.example.springbootboard.domain;
 
+import com.example.springbootboard.error.exception.NotAllowedAccessException;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -43,20 +44,16 @@ public class Post extends BaseEntity {
 
         Post post = new Post(user.getName(), LocalDateTime.now(), title, content, user);
 
-        post.setUser(user);
-
         return post;
     }
 
-    //== 연관관계 편의 메서드 ==//
-    private void setUser(User user) {
-        this.user = user;
-    }
-
     //== 비즈니스 로직 ==//
-    public void update(Title title, String content) {
-        validTitle(title);
-        validContent(content);
+    public void update(User user, Title title, String content) {
+
+        if (user != this.getUser())
+            throw new NotAllowedAccessException(MessageFormat.format("User not able to update post. userId = {0}", user.getId()));
+
+        validate(title, content, user);
 
         this.title = title;
         this.content = content;
@@ -70,6 +67,8 @@ public class Post extends BaseEntity {
 
     private static void validUser(User user) {
         Assert.notNull(user, "User should not be null");
+
+        validUserLogin(user);
     }
 
     private static void validContent(String content) {
@@ -86,5 +85,10 @@ public class Post extends BaseEntity {
         if (title.isShorterThanMinLength()) {
             throw new IllegalArgumentException(MessageFormat.format("Post title length should be over {0}", Title.TITLE_MIN_LENGTH));
         }
+    }
+
+    private static void validUserLogin(User user) {
+        if (!user.isLogin())
+            throw new NotAllowedAccessException(MessageFormat.format("User should be logged in. userId = {0}", user.getId()));
     }
 }
