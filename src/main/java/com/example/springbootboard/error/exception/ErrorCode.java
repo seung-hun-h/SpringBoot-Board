@@ -10,7 +10,12 @@ public enum ErrorCode {
     INVALID_TYPE_VALUE(400, "C002", " Invalid Type Value"),
     ENTITY_NOT_FOUND(400, "C003", "Entity Not Found"),
     METHOD_NOT_ALLOWED(405, "C004", "Invalid Input value"),
-    INTERNAL_SERVER_ERROR(500, "C005", "Server Error"),;
+    INTERNAL_SERVER_ERROR(500, "C005", "Server Error"),
+    HANDLE_ACCESS_DENIED(403, "C006", "Access is denied"),
+
+
+    // User
+    DUPLICATE_EMAIL(400, "U001", "Email already exist");
 
     private final int status;
     private final String code;
