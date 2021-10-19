@@ -3,11 +3,13 @@ package com.example.springbootboard.service;
 import com.example.springbootboard.domain.Post;
 import com.example.springbootboard.domain.Title;
 import com.example.springbootboard.domain.User;
+import com.example.springbootboard.dto.UserDto;
 import com.example.springbootboard.dto.response.PostDto;
 import com.example.springbootboard.dto.request.RequestCreatePost;
 import com.example.springbootboard.dto.request.RequestUpdatePost;
 import com.example.springbootboard.dto.PagePostDto;
 import com.example.springbootboard.error.exception.EntityNotFoundException;
+import com.example.springbootboard.error.exception.NotAllowedAccessException;
 import com.example.springbootboard.repository.PostRepository;
 import com.example.springbootboard.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +32,7 @@ public class PostService {
     @Transactional
     public Long save(RequestCreatePost request) {
 
-        User user = request.getUserDto().toEntity();
-        userRepository.save(user);
+        User user = getUser(request.getUserId());
 
         Post post = postRepository.save(request.toEntity(user));
 
@@ -40,11 +41,12 @@ public class PostService {
 
     @Transactional
     public Long update(Long id, RequestUpdatePost request) {
+        User user = getUser(request.getUserId());
 
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format("There is no post. id = {0}", id)));
 
-        post.update(new Title(request.getTitle()), request.getContent());
+        post.update(user, new Title(request.getTitle()), request.getContent());
 
         return id;
     }
@@ -91,6 +93,13 @@ public class PostService {
                 .last(result.isLast())
                 .totalElements(result.getTotalElements())
                 .totalPages(result.getTotalPages()).build();
+    }
+
+    private User getUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format("There is no user. id = {0}", userId)));
+
+        return user;
     }
 }
 

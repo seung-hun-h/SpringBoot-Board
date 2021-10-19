@@ -14,6 +14,9 @@ import javax.validation.constraints.Size;
 @Getter
 public class RequestUpdatePost {
 
+    @NotNull
+    private Long userId;
+
     @Size(min = Title.TITLE_MIN_LENGTH, max = Title.TITLE_MAX_LENGTH, message = "게시물 제목의 길이를 확인해주세요")
     @NotBlank(message = "게시물 제목은 필수입니다")
     private String title;
@@ -22,7 +25,8 @@ public class RequestUpdatePost {
     private String content;
 
     @Builder
-    public RequestUpdatePost(String title, String content) {
+    public RequestUpdatePost(Long userId, String title, String content) {
+        this.userId = userId;
         this.title = title;
         this.content = content;
     }

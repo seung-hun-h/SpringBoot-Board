@@ -19,9 +19,8 @@ import javax.validation.constraints.Size;
 @Setter
 public class RequestCreatePost {
     
-    @NotNull(message = "사용자 정보는 필수입니다")
-    @JsonProperty("user")
-    private UserDto userDto;
+    @NotNull
+    private Long userId;
 
     @Size(min = Title.TITLE_MIN_LENGTH, max = Title.TITLE_MAX_LENGTH, message = "게시물 제목의 길이를 확인해주세요")
     @NotBlank(message = "게시물 제목은 필수입니다")
@@ -31,8 +30,8 @@ public class RequestCreatePost {
     private String content;
 
     @Builder
-    public RequestCreatePost(UserDto userDto, String title, String content) {
-        this.userDto = userDto;
+    public RequestCreatePost(Long userId, String title, String content) {
+        this.userId = userId;
         this.title = title;
         this.content = content;
     }

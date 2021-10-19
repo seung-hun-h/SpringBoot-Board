@@ -4,10 +4,7 @@ import com.example.springbootboard.domain.User;
 import com.example.springbootboard.dto.UserDto;
 import com.example.springbootboard.dto.request.RequestSaveUser;
 import com.example.springbootboard.dto.request.RequestUpdateUser;
-import com.example.springbootboard.error.exception.DuplicateEmailException;
-import com.example.springbootboard.error.exception.EntityNotFoundException;
-import com.example.springbootboard.error.exception.ErrorCode;
-import com.example.springbootboard.error.exception.NotAllowedAccessException;
+import com.example.springbootboard.error.exception.*;
 import com.example.springbootboard.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -74,10 +71,13 @@ public class UserService {
 
     @Transactional
     public void login(String email, String password) {
+
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format("There is no user. email = {0}", email)));
+                .orElseThrow(() -> new AuthenticationCredentialNotFoundException("Check your email or password"));
 
         user.login(password);
+
+        System.out.println("user.isLogin() = " + user.isLogin());
     }
 
     @Transactional
