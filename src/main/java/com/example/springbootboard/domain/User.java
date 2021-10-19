@@ -1,5 +1,6 @@
 package com.example.springbootboard.domain;
 
+import com.example.springbootboard.error.exception.AuthenticationCredentialNotFoundException;
 import com.example.springbootboard.error.exception.NotAllowedAccessException;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,7 +39,7 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name = "name", length = 30)
+    @Column(name = "name", length = 30, nullable = false)
     private String name;
 
     @Column(name = "age")
@@ -87,13 +88,12 @@ public class User extends BaseEntity {
     public void login(String password) {
         validPassword(password);
 
-        if (!this.password.equals(password)) {
-            throw new IllegalArgumentException(MessageFormat.format("Wrong password. password = {0}", password));
-        }
+        if (!checkPassword(password))
+           throw new AuthenticationCredentialNotFoundException("Check your email or password");
 
-        if (this.isLogin()) {
+
+        if (isLogin())
             throw new IllegalStateException("User is already logged in");
-        }
 
         this.login = true;
     }
@@ -103,6 +103,10 @@ public class User extends BaseEntity {
             throw new NotAllowedAccessException(MessageFormat.format("User is not logged in. email = {0}", this.email));
 
         this.login = false;
+    }
+
+    private boolean checkPassword(String password) {
+        return this.password.equals(password);
     }
 
     //== 검증 메서드 ==//
@@ -134,8 +138,7 @@ public class User extends BaseEntity {
 
     private void validName(String name) {
 
-        if (name == null)
-            return;
+        Assert.notNull(name, "User name should not be null");
 
         if (!Pattern.matches(nameRegex, name)) {
             throw new IllegalArgumentException(MessageFormat.format("Invalid User name. name = {0}", name));
