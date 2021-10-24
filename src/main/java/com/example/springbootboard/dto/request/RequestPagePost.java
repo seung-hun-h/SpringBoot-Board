@@ -2,6 +2,7 @@ package com.example.springbootboard.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import lombok.Getter;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 @Getter
@@ -22,7 +23,8 @@ public class RequestPagePost {
         this.direction = direction;
     }
     // getter
-    public org.springframework.data.domain.PageRequest of() {
-        return org.springframework.data.domain.PageRequest.of(page -1, size, Sort.Direction.fromString(direction), "createdAt");
+    public PageRequest of() {
+        System.out.println("size = " + size);
+        return PageRequest.of(page -1, size, Sort.Direction.fromString(direction), "createdAt");
     }
 }

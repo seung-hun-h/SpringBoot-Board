@@ -18,7 +18,7 @@ public class RequestSaveUser {
     private String email;
     @NotBlank
     private String password;
-
+    @NotBlank
     private String name;
     private Integer age;
     private String hobby;
