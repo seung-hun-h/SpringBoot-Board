@@ -2,6 +2,8 @@ package com.example.springbootboard.service;
 
 import com.example.springbootboard.domain.User;
 import com.example.springbootboard.dto.UserDto;
+import com.example.springbootboard.dto.request.RequestLoginUser;
+import com.example.springbootboard.dto.request.RequestLogoutUser;
 import com.example.springbootboard.dto.request.RequestSaveUser;
 import com.example.springbootboard.dto.request.RequestUpdateUser;
 import com.example.springbootboard.error.exception.*;
@@ -70,20 +72,20 @@ public class UserService {
     }
 
     @Transactional
-    public void login(String email, String password) {
+    public Long login(RequestLoginUser request) {
 
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AuthenticationCredentialNotFoundException("Check your email or password"));
 
-        user.login(password);
+        user.login(request.getPassword());
 
-        System.out.println("user.isLogin() = " + user.isLogin());
+        return user.getId();
     }
 
     @Transactional
-    public void logout(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format("There is no user. email = {0}", email)));
+    public void logout(RequestLogoutUser request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new EntityNotFoundException(MessageFormat.format("There is no user. email = {0}", request.getEmail())));
 
         user.logout();
     }
