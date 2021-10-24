@@ -228,7 +228,7 @@ class PostApiControllerTest {
         String json = objectMapper.writeValueAsString(update);
 
         //when
-        ResultActions actions = mockMvc.perform(RestDocumentationRequestBuilders.put("/api/v1/posts/{postId}", postId)
+        ResultActions actions = mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/v1/posts/{postId}", postId)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(json));
 
@@ -293,7 +293,7 @@ class PostApiControllerTest {
         String json = objectMapper.writeValueAsString(update);
 
         //when
-        ResultActions actions = mockMvc.perform(RestDocumentationRequestBuilders.put("/api/v1/posts/{postId}", postId + 1)
+        ResultActions actions = mockMvc.perform(RestDocumentationRequestBuilders.patch("/api/v1/posts/{postId}", postId + 1)
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .content(json));
 

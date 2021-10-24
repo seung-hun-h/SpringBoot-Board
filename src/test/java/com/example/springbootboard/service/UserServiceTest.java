@@ -3,6 +3,8 @@ package com.example.springbootboard.service;
 import com.example.springbootboard.domain.Hobby;
 import com.example.springbootboard.domain.User;
 import com.example.springbootboard.dto.UserDto;
+import com.example.springbootboard.dto.request.RequestLoginUser;
+import com.example.springbootboard.dto.request.RequestLogoutUser;
 import com.example.springbootboard.dto.request.RequestSaveUser;
 import com.example.springbootboard.dto.request.RequestUpdateUser;
 import com.example.springbootboard.error.exception.DuplicateEmailException;
@@ -178,7 +180,7 @@ class UserServiceTest {
         userRepository.save(user);
 
         //when
-        userService.login(user.getEmail(), user.getPassword());
+        userService.login(new RequestLoginUser(user.getEmail(), user.getPassword()));
 
         //then
         User actual = userRepository.findById(user.getId()).get();
@@ -198,10 +200,10 @@ class UserServiceTest {
                 .build();
 
         userRepository.save(user);
-        userService.login(user.getEmail(), user.getPassword());
+        userService.login(new RequestLoginUser(user.getEmail(), user.getPassword()));
         
         //when
-        userService.logout(user.getEmail());
+        userService.logout(new RequestLogoutUser(user.getEmail()));
 
         //then
         assertThat(user.isLogin()).isFalse();
@@ -218,7 +220,7 @@ class UserServiceTest {
                 .build();
         Long id = userService.save(request);
 
-        userService.login(request.getEmail(), request.getPassword());
+        userService.login(new RequestLoginUser(request.getEmail(), request.getPassword()));
 
         RequestUpdateUser requestUpdate = RequestUpdateUser.builder()
                 .name("name")
@@ -278,7 +280,7 @@ class UserServiceTest {
                 .build();
 
         userRepository.save(user);
-        userService.login(user.getEmail(), user.getPassword());
+        userService.login(new RequestLoginUser(user.getEmail(), user.getPassword()));
 
         //when
         userService.deleteById(user.getId());
