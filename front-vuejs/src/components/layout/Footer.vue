@@ -1,6 +1,6 @@
 <template>
 	<footer>
-		<p>copyRight fyzh99.tistory.com</p>
+		<p>copyRight <a href="https://github.com/seung-hun-h">Seung hun</a></p>
 	</footer>
 </template>
 
